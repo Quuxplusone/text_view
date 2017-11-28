@@ -17,14 +17,14 @@ set(CMAKE_MODULE_PATH
 
 # Locate dependencies.  Prefer config mode for CMCSTL2, but fall back to module
 # mode if it isn't found.
-find_package(CMCSTL2 QUIET NO_MODULE)
-if(NOT CMCSTL2_FOUND)
-  find_package(CMCSTL2 MODULE REQUIRED)
-endif()
+#find_package(CMCSTL2 QUIET NO_MODULE)
+#if(NOT CMCSTL2_FOUND)
+#  find_package(CMCSTL2 MODULE REQUIRED)
+#endif()
 
 # Set variables used to set compiler options.
 set(text_view_COMPILE_OPTIONS
-      -Wall -Werror -Wpedantic)
+      -std=c++1z -W -Wall -Werror -Wpedantic -Wno-unused-parameter)
 set(text_view_DEFINITIONS)
 set(text_view_INCLUDE_DIR
       ${CMAKE_CURRENT_LIST_DIR}/include)

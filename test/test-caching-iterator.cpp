@@ -10,13 +10,16 @@
 #endif
 
 #include <cassert>
-#include <experimental/ranges/iterator>
+#include <iterator>
 #include <text_view_detail/adl_customization.hpp>
 #include <text_view_detail/caching_iterator.hpp>
+#include <text_view_detail/ranges_concepts.hpp>
 #include "test_adapters.hpp"
 
 using namespace std::experimental;
 using namespace std::experimental::text_detail;
+
+namespace ranges { using stdx::size; }
 
 int main() {
     int seq[] = { 1, 2, 3, 4 };
@@ -25,9 +28,9 @@ int main() {
     using CI = caching_iterator<IIA>;
     using CIS = caching_iterator_sentinel<IIA>;
 
-    static_assert(ranges::ForwardIterator<CI>);
-    static_assert(!ranges::BidirectionalIterator<CI>);
-    static_assert(ranges::Sentinel<CIS, CI>);
+    static_assert(is_ForwardIterator_v<CI>);
+    static_assert(!is_BidirectionalIterator_v<CI>);
+    static_assert(is_Sentinel_v<CIS, CI>);
 
     CI ci = IIA{adl_begin(seq)};
     CIS cis = IIA{adl_end(seq)};

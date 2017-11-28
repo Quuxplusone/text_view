@@ -9,7 +9,6 @@
 
 
 #include <iterator>
-#include <experimental/ranges/iterator>
 #include <text_view_detail/adl_customization.hpp>
 
 
@@ -17,7 +16,7 @@
 // types that don't also satisfy forward iterator requirements or impose
 // additional requirements.  istream_iterator, for example, requires a
 // char_traits specialization for its character type.
-template<std::experimental::ranges::InputIterator IT>
+template<class IT, class = std::enable_if_t<is_InputIterator_v<IT>>>
 class input_iterator_adapter {
 public:
     using iterator_category = std::input_iterator_tag;
@@ -67,8 +66,8 @@ private:
 // char_traits specialization for its character type.
 template<
     typename IT,
-    typename T>
-requires std::experimental::ranges::OutputIterator<IT, T>
+    typename T,
+    class = std::enable_if_t<is_OutputIterator_v<IT, T>>>
 class output_iterator_adapter {
 public:
     using iterator_category = std::output_iterator_tag;
@@ -105,7 +104,7 @@ private:
 // Input view adapter.  The standard doesn't provide a container type with
 // input iterators that aren't also forward, bidirectional, or random access
 // iterators.
-template<std::experimental::ranges::InputRange RT>
+template<class RT, class = std::enable_if_t<is_InputRange_v<RT>>>
 class input_range_view_adapter {
 public:
     input_range_view_adapter() = default;
@@ -139,11 +138,11 @@ private:
 
 // Iterable view adapter.  This class provides an input range with different
 // return types for begin() and end().
-template<std::experimental::ranges::InputRange RT>
+template<class RT, class = std::enable_if_t<is_InputRange_v<RT>>>
 class iterable_view_adapter {
 public:
     using range_type = RT;
-    using iterator = std::experimental::ranges::iterator_t<std::add_const_t<RT>>;
+    using iterator = stdx::iterator_t<std::add_const_t<RT>>;
 
     class sentinel {
     public:

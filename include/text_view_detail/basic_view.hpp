@@ -9,7 +9,7 @@
 
 
 #include <utility>
-#include <experimental/ranges/concepts>
+#include <text_view_detail/ranges_concepts.hpp>
 
 
 namespace std {
@@ -17,8 +17,8 @@ namespace experimental {
 inline namespace text {
 namespace text_detail {
 
-template<ranges::Iterator IT, ranges::Sentinel<IT> ST = IT>
-class basic_view : public ranges::view_base
+template<class IT, class ST = IT, class = std::enable_if_t<is_Iterator_v<IT> && is_Sentinel_v<ST, IT>>>
+class basic_view
 {
 public:
     using iterator = IT;
@@ -28,15 +28,17 @@ public:
     basic_view(IT first, ST last)
         : first{first}, last{last} {}
 
-    template<typename IT2, typename ST2>
-    requires ranges::Constructible<IT, IT2&&>
-          && ranges::Constructible<ST, ST2&&>
+    template<class IT2, class ST2, class = std::enable_if_t<
+        stdx::is_constructible_v<IT, IT2&&> &&
+        stdx::is_constructible_v<ST, ST2&&>
+    >>
     basic_view(IT2 first, ST2 last)
         : first(std::move(first)), last(std::move(last)) {}
 
-    template<typename IT2, typename ST2>
-    requires ranges::Constructible<IT, IT2&&>
-          && ranges::Constructible<ST, ST2&&>
+    template<class IT2, class ST2, class = std::enable_if_t<
+        stdx::is_constructible_v<IT, IT2&&> &&
+        stdx::is_constructible_v<ST, ST2&&>
+    >>
     basic_view(const basic_view<IT2, ST2> &o)
         : first(o.begin()), last(o.end()) {}
 
@@ -49,7 +51,7 @@ private:
 };
 
 
-template<ranges::Iterator IT, ranges::Sentinel<IT> ST>
+template<class IT, class ST, class = std::enable_if_t<is_Iterator_v<IT> && is_Sentinel_v<ST, IT>>>
 auto make_basic_view(IT first, ST last) {
     return basic_view<IT, ST>{std::move(first), std::move(last)};
 }

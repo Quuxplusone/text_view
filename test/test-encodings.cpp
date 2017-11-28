@@ -18,9 +18,9 @@
 #include <list>
 #include <vector>
 #include <string>
-#include <experimental/ranges/algorithm>
-#include <experimental/ranges/iterator>
-#include <experimental/ranges/utility>
+#include <algorithm>
+#include <iterator>
+#include <utility>
 #include <experimental/text_view>
 #include <text_view_detail/archetypes.hpp>
 #include <text_view_detail/adl_customization.hpp>

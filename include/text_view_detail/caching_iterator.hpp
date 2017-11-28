@@ -10,7 +10,9 @@
 
 #include <deque>
 #include <memory>
-#include <experimental/ranges/iterator>
+#include <iterator>
+#include <text_view_detail/ranges_concepts.hpp>
+#include <text_view_detail/ranges_mixin.hpp>
 #include <text_view_detail/basic_view.hpp>
 
 
@@ -41,15 +43,14 @@ namespace text_detail {
 // to retrieve values that were read by algorithms, such as parsers, that
 // require some degree of look ahead, but that still require further processing.
 
-template<ranges::InputIterator I>
-requires ! ranges::ForwardIterator<I>
+template<class I, class = std::enable_if_t<is_InputIterator_v<I> && !is_ForwardIterator_v<I>> >
 class caching_cursor
 {
     using iterator_type = I;
-    using value_type = ranges::value_type_t<I>;
+    using value_type = stdx::iterator_value_type_t<I>;
     using reference = value_type;
     using pointer = const value_type*;
-    using difference_type = ranges::difference_type_t<I>;
+    using difference_type = stdx::iterator_difference_type_t<I>;
 
     class shared_data {
     public:
@@ -169,8 +170,7 @@ private:
 /*
  * caching_iterator
  */
-template<ranges::InputIterator I>
-requires ! ranges::ForwardIterator<I>
+template<class I>
 using caching_iterator =
     ranges::basic_iterator<caching_cursor<I>>;
 
@@ -178,8 +178,7 @@ using caching_iterator =
 /*
  * make_caching_iterator
  */
-template<ranges::InputIterator I>
-requires ! ranges::ForwardIterator<I>
+template<class I, class = std::enable_if_t<is_InputIterator_v<I> && !is_ForwardIterator_v<I>> >
 caching_iterator<I>
 make_caching_iterator(I i) {
     return { i };
@@ -200,32 +199,28 @@ public:
     caching_iterator_sentinel(sentinel s)
         : s(std::move(s)) {}
 
-    template<ranges::InputIterator I>
-    requires ranges::Sentinel<S, I>
+    template<class I, class = std::enable_if_t<is_InputIterator_v<I> && is_Sentinel_v<S, I>> >
     friend bool operator==(
         const caching_iterator<I> &ci,
         const caching_iterator_sentinel &cis)
     {
         return cis.equal(ci);
     }
-    template<ranges::InputIterator I>
-    requires ranges::Sentinel<S, I>
+    template<class I, class = std::enable_if_t<is_InputIterator_v<I> && is_Sentinel_v<S, I>> >
     friend bool operator!=(
         const caching_iterator<I> &ci,
         const caching_iterator_sentinel &cis)
     {
         return !(ci == cis);
     }
-    template<ranges::InputIterator I>
-    requires ranges::Sentinel<S, I>
+    template<class I, class = std::enable_if_t<is_InputIterator_v<I> && is_Sentinel_v<S, I>> >
     friend bool operator==(
         const caching_iterator_sentinel &cis,
         const caching_iterator<I> &ci)
     {
         return ci == cis;
     }
-    template<ranges::InputIterator I>
-    requires ranges::Sentinel<S, I>
+    template<class I, class = std::enable_if_t<is_InputIterator_v<I> && is_Sentinel_v<S, I>> >
     friend bool operator!=(
         const caching_iterator_sentinel &cis,
         const caching_iterator<I> &ci)
@@ -238,8 +233,7 @@ public:
     }
 
 private:
-    template<ranges::InputIterator I>
-    requires ranges::Sentinel<S, I>
+    template<class I, class = std::enable_if_t<is_InputIterator_v<I> && is_Sentinel_v<S, I>> >
     bool equal(const caching_iterator<I> &ci) const {
         return ci.position() == ci.cache_size()
             && ci.base() == s;
